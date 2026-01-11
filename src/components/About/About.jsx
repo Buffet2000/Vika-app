@@ -1,6 +1,6 @@
 import styles from './About.module.css'
 
-// положи картинки сюда:
+
 const PORTRAIT = '/images/about-portrait.png'   // слева портрет
 const BG = '/images/bg/about-soft.png'          // опциональный фон секции (тот мягкий акварельный)
 

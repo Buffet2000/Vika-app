@@ -1,7 +1,6 @@
 import styles from './Hero.module.css'
 
-// положи картинку сюда: /public/images/hero-wide.png
-const HERO_IMG = '/images/hero-wide.png'
+import heroImg from '../../assets/images/hero-wide.png'
 
 export default function Hero() {
   return (
@@ -22,7 +21,7 @@ export default function Hero() {
         </div>
 
         <div className={styles.right} aria-hidden="true">
-          <img className={styles.image} src={HERO_IMG} alt="" />
+          <img className={styles.image} src={heroImg} alt="" />
         </div>
       </div>
     </section>

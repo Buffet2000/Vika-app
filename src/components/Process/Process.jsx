@@ -7,8 +7,7 @@ const steps = [
   { n: 4, title: 'Обратная связь с родителями', text: 'Рекомендации и сопровождение дома.' },
 ]
 
-// положи картинку сюда: /public/images/process.png
-const IMG = '/images/process.png'
+import processImg from '../../assets/images/process.png'
 
 export default function Process() {
   return (
@@ -31,7 +30,7 @@ export default function Process() {
         </div>
 
         <div className={styles.right} aria-hidden="true">
-          <img className={styles.image} src={IMG} alt="" />
+          <img className={styles.image} src={processImg} alt="" />
         </div>
       </div>
     </section>

@@ -1,10 +1,11 @@
 import styles from './HelpCards.module.css'
+import anxietyImg from '../../assets/images/icons/anxiety.png'
 
 const items = [
   {
     title: 'Тревожность',
     text: 'Страхи, переживания, неуверенность',
-    img: '/images/icons/anxiety.png',
+    img: `${anxietyImg}`,
   },
   {
     title: 'Поведение',
