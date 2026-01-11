@@ -1,0 +1,31 @@
+/* Сброс */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #222;
+  background: #f7f7f7;
+  line-height: 1.6;
+}
+
+/* Общие контейнеры */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Общие теги */
+h1, h2, h3 {
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 16px;
+}

@@ -1,0 +1,139 @@
+.section {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #fbfbfb, #eef4f3);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.title {
+  margin: 0 0 10px;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  color: #2f4f47;
+}
+
+.subtitle {
+  margin: 0 0 18px;
+  color: #4a5b56;
+  line-height: 1.6;
+  max-width: 60ch;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 44px rgba(0,0,0,0.07);
+  backdrop-filter: blur(6px);
+}
+
+.label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #2f4f47;
+  font-weight: 600;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 12px;
+  padding: 12px 12px;
+  font-size: 0.95rem;
+  background: rgba(255,255,255,0.90);
+  outline: none;
+}
+
+.textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.submit {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 800;
+  color: #fff;
+  background: #3a7f6d;
+  cursor: pointer;
+}
+
+.submit:hover {
+  background: #326f60;
+}
+
+.secondary {
+  border: 1px solid rgba(58,127,109,0.35);
+  background: rgba(58,127,109,0.08);
+  color: #2d6f5f;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.note {
+  margin: 2px 0 0;
+  color: #6a7672;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.image {
+  width: min(560px, 100%);
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+.success {
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(0,0,0,0.04);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 16px 44px rgba(0,0,0,0.07);
+}
+
+.successTitle {
+  font-weight: 900;
+  color: #2f4f47;
+  margin-bottom: 8px;
+}
+
+.successText {
+  margin: 0 0 14px;
+  color: #4a5b56;
+  line-height: 1.6;
+}
+
+/* responsive */
+@media (max-width: 920px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+  .right {
+    justify-content: center;
+  }
+}

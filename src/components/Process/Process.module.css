@@ -1,0 +1,81 @@
+.section {
+  padding: 70px 0;
+  background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.title {
+  margin: 0 0 18px;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  color: #2f4f47;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.05);
+}
+
+.badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #2d6f5f;
+  background: rgba(58, 127, 109, 0.14);
+}
+
+.stepTitle {
+  font-weight: 700;
+  color: #2f4f47;
+  margin-bottom: 4px;
+}
+
+.stepText {
+  color: #4a5b56;
+  font-size: 0.95rem;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.image {
+  width: min(520px, 100%);
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+}
+
+/* Адаптив */
+@media (max-width: 920px) {
+  .inner {
+    grid-template-columns: 1fr;
+  }
+  .right {
+    justify-content: center;
+  }
+}

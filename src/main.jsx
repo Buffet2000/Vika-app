@@ -1,10 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.jsx'
+import './styles/global.css'
+import Hero from './components/Hero/Hero.jsx'
+import HelpCards from './components/HelpCards/HelpCards.jsx'
+import Process from './components/Process/Process.jsx'
+import About from './components/About/About.jsx'
+import Pricing from './components/Pricing/Pricing.jsx'
+import Booking from './components/Booking/Booking.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Hero />
+    <HelpCards />
+    <Process />
+    <About />
+    <Pricing />
+    <Booking />
+    {/* <Services />
+    <BookingForm />
+    <Footer /> */}
   </StrictMode>,
 )
