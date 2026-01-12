@@ -16,9 +16,9 @@ createRoot(document.getElementById('root')).render(
     <Hero />
     <HelpCards />
     <WhenToAct />
+    <Process />
     <GroupProgram />
     <IndividualProgram />
-    <Process />
     <About />
     <Pricing />
     <Booking />
