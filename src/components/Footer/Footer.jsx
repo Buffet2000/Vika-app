@@ -18,7 +18,6 @@ export default function Footer() {
           <a href="/contacts" className={styles.link}>Контакты</a>
         </nav>
 
-        {/* вместо кнопки — картинка */}
         <div className={styles.right} aria-hidden="true">
           <img className={styles.art} src={footerArt} alt="" />
         </div>

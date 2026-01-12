@@ -63,8 +63,6 @@
   height: auto;
   display: block;
   border-radius: 18px;
-
-  /* “в стиле акварели” — мягко */
   opacity: 0.92;
   filter: saturate(0.95) contrast(0.98);
   box-shadow: 0 16px 40px rgba(0,0,0,0.06);

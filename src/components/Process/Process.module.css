@@ -24,8 +24,6 @@
   line-height: 1.7;
 }
 
-/* ===== Main Card ===== */
-
 .box {
   position: relative;
   overflow: hidden;
@@ -55,8 +53,6 @@
   filter: saturate(0.95);
 }
 
-/* ===== Layout ===== */
-
 .inner {
   position: relative;
   z-index: 1;
@@ -77,8 +73,6 @@
   display: flex;
   justify-content: flex-end;
 }
-
-/* ===== Steps ===== */
 
 .list {
   list-style: none;
@@ -129,8 +123,6 @@
   line-height: 1.55;
 }
 
-/* ===== Image ===== */
-
 .image {
   width: min(520px, 100%);
   height: auto;
@@ -140,8 +132,6 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
   filter: saturate(0.95) contrast(0.98);
 }
-
-/* ===== Responsive ===== */
 
 @media (max-width: 920px) {
   .inner {

@@ -1,6 +1,5 @@
 import styles from './WhenToAct.module.css'
 
-// Вариант А (рекомендую): положи картинку в src/assets/images/blocks/when-to-act.png
 import img from '../../assets/images/blocks/when-to-act.png'
 
 export default function WhenToAct() {

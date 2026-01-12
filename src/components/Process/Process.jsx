@@ -1,7 +1,6 @@
 import styles from './Process.module.css'
 import processImg from '../../assets/images/process.png'
 
-// (опционально) можешь подложить акварельный фон, как в других блоках:
 import bg from '../../assets/images/backgrounds/backgroung-horizontal.png'
 
 const steps = [
@@ -24,7 +23,7 @@ export default function Process() {
 
         <article
           className={styles.box}
-          style={{ '--bg': `url(${bg})` }} // включи, если добавишь фон-картинку
+          style={{ '--bg': `url(${bg})` }}
         >
           <div className={styles.bg} aria-hidden="true" />
 

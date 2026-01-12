@@ -76,7 +76,6 @@
   background: #326f60;
 }
 
-/* Burger */
 .burger {
   display: none;
   width: 44px;
@@ -96,7 +95,6 @@
   border-radius: 2px;
 }
 
-/* Mobile */
 @media (max-width: 820px) {
   .burger { display: inline-block; }
 
