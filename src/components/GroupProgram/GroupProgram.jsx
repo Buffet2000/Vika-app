@@ -1,6 +1,5 @@
 import styles from './GroupProgram.module.css'
-import bg from '../../assets/images/backgrounds/help-kids-bg.png'
-import decor from '../../assets/images/backgrounds/help-kids-bg-2.png'
+import bg from '../../assets/images/backgrounds/backgroung-horizontal.png'
 
 const forWho = [
   'часто тревожатся и переживают',
@@ -56,7 +55,6 @@ export default function GroupProgram() {
           className={styles.card}
           style={{
             '--bg': `url(${bg})`,
-            '--decor': `url(${decor})`,
           }}
         >
           <div className={styles.bg} aria-hidden="true" />
@@ -73,7 +71,6 @@ export default function GroupProgram() {
                 </p>
               </div>
 
-              {/* ✅ КНОПКА ТЕПЕРЬ ЗДЕСЬ */}
               <div className={styles.actionsLeft}>
                 <a className={styles.btn} href="#booking">
                   Записаться на консультацию
@@ -92,8 +89,6 @@ export default function GroupProgram() {
                 <h4 className={styles.blockTitle}>После курса родители обычно замечают</h4>
                 <BulletList items={results} />
               </div>
-
-              {/* ❌ actions отсюда УБРАЛИ */}
             </aside>
           </div>
         </article>

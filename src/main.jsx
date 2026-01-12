@@ -9,6 +9,7 @@ import Pricing from './components/Pricing/Pricing.jsx'
 import Booking from './components/Booking/Booking.jsx'
 import WhenToAct from './components/WhenToAct/WhenToAct.jsx'
 import GroupProgram from './components/GroupProgram/GroupProgram.jsx'
+import IndividualProgram from './components/IndividualProgram/IndividualProgram.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
     <HelpCards />
     <WhenToAct />
     <GroupProgram />
+    <IndividualProgram />
     <Process />
     <About />
     <Pricing />
