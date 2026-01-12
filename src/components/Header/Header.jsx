@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import styles from './Header.module.css'
 
+import { Link } from 'react-router-dom'
+
 export default function Header() {
   const [open, setOpen] = useState(false)
 
@@ -16,7 +18,7 @@ export default function Header() {
           <a className={styles.link} href="/">Главная</a>
           <a className={styles.link} href="/posts">Статьи</a>
           <a className={styles.link} href="/counseling">Консультации</a>
-          <a className={styles.link} href="/about">Обо мне</a>
+          <Link to="/about" className={styles.link}>Обо мне</Link>
 
           <a className={styles.cta} href="#booking" onClick={() => setOpen(false)}>
             Записаться
