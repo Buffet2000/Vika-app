@@ -8,12 +8,14 @@ import About from './components/About/About.jsx'
 import Pricing from './components/Pricing/Pricing.jsx'
 import Booking from './components/Booking/Booking.jsx'
 import WhenToAct from './components/WhenToAct/WhenToAct.jsx'
+import GroupProgram from './components/GroupProgram/GroupProgram.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Hero />
     <HelpCards />
     <WhenToAct />
+    <GroupProgram />
     <Process />
     <About />
     <Pricing />
