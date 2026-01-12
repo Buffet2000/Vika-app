@@ -1,0 +1,167 @@
+.section {
+  padding: 26px 0;
+}
+
+.box {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.10);
+  background: #fbfbfb;
+
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.box::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* мягкая акварельная подсветка */
+  background: radial-gradient(
+    circle at 12% 80%,
+    rgba(58, 127, 109, 0.14),
+    transparent 58%
+  );
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: 26px 26px 35px 45px;
+  max-width: 720px;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: #2f4f47;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.lead {
+  margin: 0 0 14px;
+  color: #4a5b56;
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  gap: 10px;
+  align-items: start;
+  color: #3f4e49;
+  line-height: 1.6;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-top: 9px;
+  background: rgba(58, 127, 109, 0.75);
+}
+
+.actions {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  align-items: start;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 35px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #3a7f6d;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 800;
+
+  box-shadow: 0 10px 22px rgba(58, 127, 109, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+
+.btn:hover {
+  background: #326f60;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(58, 127, 109, 0.26);
+}
+
+.note {
+  color: rgba(63, 78, 73, 0.78);
+  font-size: 0.95rem;
+}
+
+/* Правая картинка */
+.media {
+  position: relative;
+  z-index: 1;
+  padding: 18px 18px 18px 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.img {
+  width: min(320px, 100%);
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  /* чтобы выглядело “в стиле” и не выбивалось */
+  filter: saturate(0.95) contrast(0.98);
+}
+
+/* Планшет/мобилка */
+@media (max-width: 900px) {
+  .box {
+    grid-template-columns: 1fr;
+  }
+
+  .media {
+    padding: 0 18px 18px;
+    justify-content: center;
+  }
+
+  .img {
+    width: min(420px, 100%);
+  }
+}
+
+/* Маленькие телефоны (iPhone SE и т.п.) */
+@media (max-width: 420px) {
+  .content {
+    padding: 18px;
+  }
+
+  .title {
+    font-size: 1.22rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
