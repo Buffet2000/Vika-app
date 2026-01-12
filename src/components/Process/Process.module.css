@@ -1,27 +1,91 @@
 .section {
-  padding: 70px 0;
-  background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
+  padding: 56px 0 18px;
 }
 
-.inner {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 28px;
-  align-items: center;
+.head {
+  text-align: center;
+  margin-bottom: 18px;
 }
 
 .title {
-  margin: 0 0 18px;
-  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  margin: 0 0 10px;
   color: #2f4f47;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.6rem, 2.6vw, 2.15rem);
+  line-height: 1.12;
 }
+
+.lead {
+  margin: 0 auto;
+  max-width: 820px;
+  color: #4a5b56;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* ===== Main Card ===== */
+
+.box {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+}
+
+/* Мягкий фон (в стиле остальных блоков).
+   По умолчанию — лёгкая виньетка.
+   Если хочешь акварельный фон: раскомментируй style={{'--bg': `url(${bg})`}}
+   в компоненте и добавь background-image слоём. */
+.bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(0deg, rgba(255,255,255,0.70), rgba(255,255,255,0.95)),
+    var(--bg);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+ 
+
+  filter: saturate(0.95);
+}
+
+/* ===== Layout ===== */
+
+.inner {
+  position: relative;
+  z-index: 1;
+  padding: 28px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 22px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.left {
+  min-width: 0;
+}
+
+.right {
+  min-width: 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ===== Steps ===== */
 
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .item {
@@ -29,53 +93,87 @@
   grid-template-columns: 40px 1fr;
   gap: 12px;
   align-items: start;
+
   padding: 14px 14px;
   border-radius: 16px;
+
   background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(0,0,0,0.04);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(6px);
+
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.05);
 }
 
 .badge {
   width: 34px;
   height: 34px;
   border-radius: 999px;
+  margin-top: 10px;
   display: grid;
   place-items: center;
-  font-weight: 700;
+
+  font-weight: 900;
   color: #2d6f5f;
   background: rgba(58, 127, 109, 0.14);
 }
 
 .stepTitle {
-  font-weight: 700;
+  font-weight: 900;
   color: #2f4f47;
   margin-bottom: 4px;
 }
 
 .stepText {
   color: #4a5b56;
-  font-size: 0.95rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
 }
 
-.right {
-  display: flex;
-  justify-content: flex-end;
-}
+/* ===== Image ===== */
 
 .image {
   width: min(520px, 100%);
   height: auto;
+  display: block;
+
   border-radius: 18px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  filter: saturate(0.95) contrast(0.98);
 }
 
-/* Адаптив */
+/* ===== Responsive ===== */
+
 @media (max-width: 920px) {
   .inner {
     grid-template-columns: 1fr;
+    padding: 18px;
   }
+
   .right {
     justify-content: center;
+  }
+
+  .image {
+    width: min(520px, 100%);
+  }
+}
+
+@media (max-width: 420px) {
+  .section {
+    padding: 38px 0 12px;
+  }
+
+  .lead {
+    font-size: 0.98rem;
+  }
+
+  .item {
+    padding: 12px;
+    grid-template-columns: 36px 1fr;
+  }
+
+  .badge {
+    width: 32px;
+    height: 32px;
   }
 }
