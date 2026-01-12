@@ -1,30 +1,29 @@
 import styles from './Footer.module.css'
-import footerArt from '../../assets/images/blocks/footer-img.png'
+import footerImg from '../../assets/images/blocks/footer-img2.png'
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
+        
         <div className={styles.left}>
-          <div className={styles.brand}>Детский и семейный психолог</div>
-          <p className={styles.quote}>
+          <blockquote className={styles.quote}>
             «Когда чувства находят слова — становится легче жить.»
-          </p>
+          </blockquote>
+          <div className={styles.copy}>© 2026</div>
         </div>
 
-        <nav className={styles.nav} aria-label="Меню в подвале">
-          <a href="/" className={styles.link}>Главная</a>
-          <a href="/services" className={styles.link}>Услуги</a>
-          <a href="/contacts" className={styles.link}>Контакты</a>
+        <nav className={styles.menu}>
+          <a href="#">Главная</a>
+          <a href="#posts">Статьи</a>
+          <a href="#counseling">Консультации</a>
+          <a href="#about">Обо мне</a>
         </nav>
 
-        <div className={styles.right} aria-hidden="true">
-          <img className={styles.art} src={footerArt} alt="" />
+        <div className={styles.media} aria-hidden="true">
+          <img src={footerImg} alt="" />
         </div>
-      </div>
 
-      <div className={styles.bottom}>
-        <span>© {new Date().getFullYear()} Психолог</span>
       </div>
     </footer>
   )
