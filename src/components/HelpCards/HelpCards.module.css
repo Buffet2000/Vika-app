@@ -1,67 +1,170 @@
 .section {
-  padding: 44px 0 70px;
-  background: #fbfbfb;
+  padding: 80px 0 90px;
 }
 
 .title {
   text-align: center;
-  margin: 0 0 26px;
-  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-weight: 800;
   color: #2f4f47;
+  margin-bottom: 10px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+.lead {
+  max-width: 720px;
+  margin: 0 auto 42px;
+  text-align: center;
+  color: #4a5b56;
+  font-size: 1rem;
+  line-height: 1.6;
 }
+
+/* ===== Layout ===== */
+
+.layout {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.stack {
+  display: grid;
+  gap: 22px;
+}
+
+/* ===== Cards ===== */
 
 .card {
-  background: rgba(255, 255, 255, 0.86);
-  border-radius: 18px;
-  padding: 18px 18px;
-  display: grid;
-  grid-template-columns: 74px 1fr;
-  gap: 14px;
+  position: relative;
+  background-image: url('../../assets/images/backgrounds/help-kids-bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  border-radius: 22px;
+  padding: 26px 26px 28px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+
+  background: rgba(255, 255, 255, 0.75);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cardLarge {
+  position: relative;
+  background-image: url('../../assets/images/backgrounds/help-kids-bg.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  padding: 32px 32px 34px;
+  overflow: hidden;
+}
+
+.cardLarge > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cardLarge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+
+  /* 🔧 ТУТ регулируешь "блеклость" */
+  background: rgba(255, 255, 255, 0.65);
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== Header ===== */
+
+.cardHeader {
+  display: flex;
   align-items: center;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
-  border: 1px solid rgba(0,0,0,0.04);
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.iconWrap {
-  width: 74px;
-  height: 74px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(58,127,109,0.10), rgba(58,127,109,0.04));
-  display: grid;
-  place-items: center;
-}
-
-.icon {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  filter: saturate(0.98);
+.dotTitle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #3a7f6d;
+  margin-bottom: 16px;
 }
 
 .cardTitle {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: #2f4f47;
 }
 
-.cardText {
+/* ===== List ===== */
+
+.list {
+  display: grid;
+  gap: 10px;
   margin: 0;
-  color: #4a5b56;
-  font-size: 0.95rem;
+  padding: 0;
+  list-style: none;
 }
 
-/* Адаптив */
-@media (max-width: 920px) {
-  .grid {
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #86b3a3;
+  margin-top: 9px;
+  flex-shrink: 0;
+}
+
+.text {
+  color: #3f4f4a;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ===== Note ===== */
+
+.note {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(58,127,109,0.08);
+  color: #2f4f47;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 900px) {
+  .layout {
     grid-template-columns: 1fr;
   }
-  .card {
-    grid-template-columns: 74px 1fr;
+
+  .section {
+    padding: 60px 0 70px;
   }
 }
