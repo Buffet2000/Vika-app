@@ -124,9 +124,6 @@
 @media (max-width: 520px) {
   .heroBox {
     min-height: 480px;
-
-    /* немного сдвигаем сцену,
-       чтобы лицо психолога оставалось в кадре */
     background-position:
       center,
       left bottom,
@@ -140,18 +137,18 @@
   }
 
   .title {
-    font-size: 1.45rem;   /* ~23px */
+    font-size: 1.45rem;
     line-height: 1.15;
     letter-spacing: -0.015em;
   }
 
   .subtitle {
-    font-size: 0.95rem;   /* ~15px */
+    font-size: 0.95rem;
     line-height: 1.55;
   }
 
   .btn {
-    font-size: 0.95rem;   /* ~15px */
+    font-size: 0.95rem;
     padding: 12px 16px;
   }
 }

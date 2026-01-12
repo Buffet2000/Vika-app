@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import styles from './Booking.module.css'
 
-// положи картинку сюда: /public/images/booking.png
 const IMG = '/images/booking.png'
 
 export default function Booking() {

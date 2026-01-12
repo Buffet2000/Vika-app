@@ -1,8 +1,6 @@
 import styles from './Hero.module.css'
 
-// Левый декоративный фон
 import leftDecor from '../../assets/images/hero-left.png'
-// Правая сцена (психолог + ребёнок)
 import rightScene from '../../assets/images/hero-right.png'
 
 export default function Hero() {

@@ -128,7 +128,6 @@
   line-height: 1.6;
 }
 
-/* responsive */
 @media (max-width: 920px) {
   .inner {
     grid-template-columns: 1fr;

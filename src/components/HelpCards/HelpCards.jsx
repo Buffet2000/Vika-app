@@ -71,7 +71,6 @@ export default function HelpCards() {
         </p>
 
         <div className={styles.layout}>
-          {/* Большая карточка с фоном */}
           <Card
             variant="large"
             title="Для детей и подростков"
@@ -79,7 +78,6 @@ export default function HelpCards() {
             note="Если вы узнаёте своего ребёнка хотя бы в нескольких пунктах — это уже повод обратиться за поддержкой."
           />
 
-          {/* Правая колонка */}
           <div className={styles.stack}>
             <Card title="Для родителей" items={parents} faded />
             <Card title="Для взрослых" items={adults} faded />

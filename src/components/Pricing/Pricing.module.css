@@ -135,7 +135,6 @@
   font-size: 0.9rem;
 }
 
-/* responsive */
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: 1fr;

@@ -26,7 +26,7 @@
   background-size: cover;
   background-position: bottom;
 
-  opacity: 0.35; /* регулируй “бледность” */
+  opacity: 0.35;
 }
 
 .content {
@@ -112,7 +112,6 @@
   font-size: 0.95rem;
 }
 
-/* Правая картинка */
 .media {
   position: relative;
   z-index: 1;
@@ -130,7 +129,6 @@
   filter: saturate(0.95) contrast(0.98);
 }
 
-/* Планшет/мобилка */
 @media (max-width: 900px) {
   .box {
     grid-template-columns: 1fr;
@@ -146,7 +144,6 @@
   }
 }
 
-/* Маленькие телефоны (iPhone SE и т.п.) */
 @media (max-width: 420px) {
   .content {
     padding: 18px;

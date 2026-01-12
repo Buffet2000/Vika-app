@@ -1,6 +1,5 @@
 import styles from './IndividualProgram.module.css'
 
-// сюда потом положишь сгенерированную картинку
 import illu from '../../assets/images/blocks/individual-left.png'
 
 const process = ['первое занятие — диагностическое']
@@ -20,12 +19,10 @@ export default function IndividualProgram() {
 
         <article className={styles.card}>
           <div className={styles.inner}>
-            {/* LEFT: illustration */}
             <div className={styles.illuWrap} aria-hidden="true">
               <img className={styles.illu} src={illu} alt="" />
             </div>
 
-            {/* RIGHT: content stack */}
             <div className={styles.content}>
               <div className={styles.block}>
                 <h3 className={styles.blockTitle}>Как проходит работа</h3>
