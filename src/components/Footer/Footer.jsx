@@ -1,6 +1,8 @@
 import styles from './Footer.module.css'
 import footerImg from '../../assets/images/blocks/footer-img2.png'
 
+import { Link } from 'react-router-dom'
+
 export default function Footer() {
   return (
     <footer className={styles.footer}>
@@ -16,8 +18,8 @@ export default function Footer() {
         <nav className={styles.menu}>
           <a href="/">Главная</a>
           <a href="/">Статьи</a>
-          <a href="/consultations">Консультации</a>
-          <a href="/about">Обо мне</a>
+          <Link to="/consultations" className={styles.link}>Консультации</Link>
+          <Link to="/about" className={styles.link}>Обо мне</Link>
         </nav>
 
         <div className={styles.media} aria-hidden="true">
