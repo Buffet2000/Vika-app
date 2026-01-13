@@ -15,8 +15,8 @@ export default function Header() {
         </a>
 
         <nav className={`${styles.nav} ${open ? styles.navOpen : ''}`} aria-label="Основное меню">
-          <a className={styles.link} href="/">Главная</a>
-          <a className={styles.link} href="/">Статьи</a>
+          <Link to="/" className={styles.link}>Главная</Link>
+          <Link to="/" className={styles.link}>Статьи</Link>
           <Link to="/consultations" className={styles.link}>Консультации</Link>
           <Link to="/about" className={styles.link}>Обо мне</Link>
 
