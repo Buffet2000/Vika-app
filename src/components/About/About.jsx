@@ -1,6 +1,5 @@
 import styles from './About.module.css'
 
-// TODO: подставь свой путь к фото
 import photo from '../../assets/images/blocks/My-photo.jpg'
 
 const certificates = [
@@ -34,13 +33,16 @@ export default function About() {
   return (
     <section className={styles.section} id="about">
       <div className="container">
-        {/* HERO */}
         <header className={styles.hero}>
           <div className={styles.heroLeft}>
             <h1 className={styles.h1}>Обо мне</h1>
             <p className={styles.sublead}>
-              Психологическое сопровождение детей, подростков и взрослых — бережно, по шагам и с опорой на
-              реальные изменения в жизни.
+              Меня зовут Виктория Деордиева.
+              Я психолог с более чем 15-летним опытом работы, много лет работаю с детьми, подростками и их родителями в системе образования и в частной практике.<br />
+            </p >
+            <p className={styles.sublead}>
+              Я знаю, как это когда ребёнок замыкается, когда в семье становится напряжённо, когда родитель не понимает, что происходит и как помочь.
+              Моя задача помочь вам и вашему ребёнку стать спокойнее, увереннее и ближе друг к другу.
             </p>
 
             <div className={styles.stats}>
@@ -68,13 +70,11 @@ export default function About() {
 
           <div className={styles.heroRight}>
             <div className={styles.photoCard}>
-              {/* Если фото ещё нет — оставь заглушку */}
               <img className={styles.photo} src={photo} alt="Фото психолога" />
             </div>
           </div>
         </header>
 
-        {/* EDUCATION */}
         <div className={styles.grid}>
           <article className={styles.card}>
             <h2 className={styles.title}>Образование</h2>
@@ -146,7 +146,6 @@ export default function About() {
           </article>
         </div>
 
-        {/* FORMATS */}
         <section className={styles.formats}>
           <header className={styles.formatsHead}>
             <h2 className={styles.h2}>Форматы работы</h2>
