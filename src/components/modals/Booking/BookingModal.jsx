@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import styles from './BookingModal.module.css'
+import { sendBooking } from '../../../api/booking'
 
 const initial = {
   name: '',
@@ -13,12 +14,12 @@ const initial = {
 
 export default function BookingModal({ open, onClose, serviceId, serviceTitle }) {
   const [form, setForm] = useState(initial)
-  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [status, setStatus] = useState('idle')
 
   const fields = useMemo(() => {
     if (serviceId === 'free') return ['name', 'contact', 'time', 'message']
     if (serviceId === 'group') return ['name', 'contact', 'childAge', 'format', 'city', 'time', 'message']
-    return ['name', 'contact', 'childAge', 'format', 'time', 'message'] // individual
+    return ['name', 'contact', 'childAge', 'format', 'time', 'message']
   }, [serviceId])
 
   useEffect(() => {
@@ -29,9 +30,10 @@ export default function BookingModal({ open, onClose, serviceId, serviceTitle })
   }, [open, onClose])
 
   useEffect(() => {
-    // при смене услуги — сброс статуса, чтобы не было "отправлено" от прошлой
+    if (!open) return
     setStatus('idle')
-  }, [serviceId])
+    setForm(initial)
+  }, [open, serviceId])
 
   if (!open) return null
 
@@ -39,22 +41,22 @@ export default function BookingModal({ open, onClose, serviceId, serviceTitle })
 
   async function submit(e) {
     e.preventDefault()
+    if (status === 'sending') return
+
     setStatus('sending')
 
     try {
-      // Пока в консоль. Потом заменим на /api/lead или supabase edge function.
-      console.log('LEAD:', {
+      await sendBooking({
         serviceId,
-        serviceTitle,
+        serviceTitle: serviceTitle || serviceId,
         ...form,
+        sourceUrl: window.location.href,
       })
-
-      // имитация
-      await new Promise((r) => setTimeout(r, 400))
 
       setStatus('sent')
       setForm(initial)
-    } catch {
+    } catch (err) {
+      console.error(err)
       setStatus('error')
     }
   }
@@ -84,12 +86,7 @@ export default function BookingModal({ open, onClose, serviceId, serviceTitle })
           {fields.includes('contact') && (
             <label className={styles.field}>
               <span>Телефон или Telegram</span>
-              <input
-                value={form.contact}
-                onChange={set('contact')}
-                required
-                placeholder="+358… или @username"
-              />
+              <input value={form.contact} onChange={set('contact')} required placeholder="+358… или @username" />
             </label>
           )}
 
