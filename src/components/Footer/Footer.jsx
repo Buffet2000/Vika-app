@@ -14,10 +14,10 @@ export default function Footer() {
         </div>
 
         <nav className={styles.menu}>
-          <a href="#">Главная</a>
-          <a href="#posts">Статьи</a>
-          <a href="#counseling">Консультации</a>
-          <a href="#about">Обо мне</a>
+          <a href="/">Главная</a>
+          <a href="/">Статьи</a>
+          <a href="/consultations">Консультации</a>
+          <a href="/about">Обо мне</a>
         </nav>
 
         <div className={styles.media} aria-hidden="true">
