@@ -5,7 +5,7 @@ import ConsultationsPage from './pages/Consultations/ConsultationsPage.jsx'
 
 export default function App() {
   return (
-    <BrowserRouter basename="/Vika-app">
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
