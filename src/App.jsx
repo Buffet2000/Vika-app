@@ -5,6 +5,8 @@ import ConsultationsPage from './pages/Consultations/ConsultationsPage.jsx'
 import ArticlePage from './pages/Article/ArticlePage.jsx'
 import Layout from './components/Layout/Layout.jsx'
 
+import ArticleEditor from './components/ArticleEditor/ArticleEditor.jsx'
+
 export default function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -14,6 +16,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/consultations" element={<ConsultationsPage />} />
           <Route path="/articles" element={<ArticlePage />} />
+          <Route path="/editor" element={<ArticleEditor />} />
         </Routes>
       </Layout>
     </BrowserRouter>

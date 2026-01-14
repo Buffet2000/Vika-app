@@ -7,6 +7,7 @@
   max-width: 1200px;
 }
 
+/* ====== Card (full) ====== */
 .card {
   position: relative;
   overflow: hidden;
@@ -93,6 +94,57 @@
   margin-bottom: 0;
 }
 
+/* ====== Mini mode (preview) ====== */
+.mini {
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.10);
+}
+
+/* обложка — ок, почти как full, но ниже */
+.mini .cover {
+  height: 300px;
+  min-height: 300px;
+  background-position: center 18%;
+}
+
+/* тело компактнее */
+.mini .body {
+  padding: 16px 18px 18px;
+}
+
+/* 🔹 ЗАГОЛОВОК */
+.mini .title {
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.15;
+  margin-bottom: 6px;
+  letter-spacing: -0.015em;
+}
+
+/* 🔹 ПОДЗАГОЛОВОК */
+.mini .subtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: #55645f;
+  max-width: 68ch;
+}
+
+/* разделитель */
+.mini .content {
+  padding-top: 12px;
+}
+
+/* 🔹 ТЕКСТ */
+.mini .prose {
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.mini .prose p {
+  margin-bottom: 10px;
+}
+
+/* ====== Mobile ====== */
 @media (max-width: 720px) {
   .section {
     padding: 34px 0 52px;
@@ -130,5 +182,23 @@
 
   .prose p {
     margin-bottom: 12px;
+  }
+
+  .mini .cover {
+    height: 220px;
+    min-height: 220px;
+    background-position: center 22%;
+  }
+
+  .mini .title {
+    font-size: 1.25rem;
+  }
+
+  .mini .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .mini .prose {
+    font-size: 0.92rem;
   }
 }
