@@ -1,0 +1,134 @@
+.section {
+  padding: 48px 0 70px;
+  background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
+}
+
+.container {
+  max-width: 1120px;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.10);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(6px);
+}
+
+.cover {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  min-height: 500px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center top;
+}
+
+.coverOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0.00) 45%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+}
+
+.coverPlaceholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: rgba(47, 79, 71, 0.55);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(58, 127, 109, 0.14),
+    transparent 60%
+  );
+}
+
+.body {
+  padding: 26px 26px 34px;
+}
+
+.title {
+  margin: 0 0 10px;
+  color: #2f4f47;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+  line-height: 1.1;
+}
+
+.subtitle {
+  margin: 0 0 18px;
+  color: #4a5b56;
+  font-size: 1.2rem;
+  line-height: 1.65;
+  max-width: 75ch;
+}
+
+.content {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 18px;
+}
+
+.prose {
+  color: #3f4e49;
+  line-height: 1.8;
+  font-size: 1.02rem;
+  max-width: 78ch;
+}
+
+.prose p {
+  margin: 0 0 14px;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 720px) {
+  .section {
+    padding: 34px 0 52px;
+  }
+
+  .card {
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  .cover {
+    height: 280px;
+    min-height: 280px;
+    background-position: center 20%;
+  }
+
+  .body {
+    padding: 18px 16px 22px;
+  }
+
+  .title {
+    font-size: 1.55rem;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .prose {
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  .prose p {
+    margin-bottom: 12px;
+  }
+}
