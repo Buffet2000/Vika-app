@@ -1,6 +1,9 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Article from '../Article/Article.jsx' // поправь путь под проект
 import styles from './ArticleEditor.module.css'
+
+import { supabase } from '../../lib/supabaseClient.js' // поправь путь под проект
+import { uploadCover } from '../../lib/uploadCover.js' // поправь путь под проект
 
 const empty = {
   title: '',
@@ -11,11 +14,21 @@ const empty = {
 
 export default function ArticleEditor() {
   const [draft, setDraft] = useState(empty)
+  const [status, setStatus] = useState('idle') // idle | saving | saved | error
+  const [errorText, setErrorText] = useState('')
 
+  // локальный preview для картинки (без загрузки)
   const coverUrl = useMemo(() => {
     if (!draft.coverFile) return ''
     return URL.createObjectURL(draft.coverFile)
   }, [draft.coverFile])
+
+  // важно: не копить blob-URL в памяти
+  useEffect(() => {
+    return () => {
+      if (coverUrl) URL.revokeObjectURL(coverUrl)
+    }
+  }, [coverUrl])
 
   function setField(key, value) {
     setDraft((p) => ({ ...p, [key]: value }))
@@ -52,18 +65,66 @@ export default function ArticleEditor() {
 
   function clearAll() {
     setDraft(empty)
+    setStatus('idle')
+    setErrorText('')
   }
 
-  // можно позже заменить на "Сохранить в Supabase"
-  function exportJson() {
-    const payload = {
+  function buildPayload() {
+    return {
       title: draft.title.trim(),
       subtitle: draft.subtitle.trim(),
       paragraphs: draft.paragraphs.map((t) => t.trim()).filter(Boolean),
-      // cover пока локальный файл, позже будет URL из Supabase Storage
     }
-    navigator.clipboard?.writeText(JSON.stringify(payload, null, 2))
-    alert('JSON скопирован в буфер обмена')
+  }
+
+  // ✅ ПУБЛИКАЦИЯ: upload cover → insert row
+  async function publish() {
+    if (status === 'saving') return
+    setErrorText('')
+
+    const payload = buildPayload()
+
+    // базовая валидация
+    if (!payload.title) {
+      setStatus('error')
+      setErrorText('Нужен заголовок.')
+      return
+    }
+    if (!payload.paragraphs.length) {
+      setStatus('error')
+      setErrorText('Добавь хотя бы один абзац.')
+      return
+    }
+
+    setStatus('saving')
+
+    try {
+      // 1) грузим обложку (если выбрана)
+      let cover_public_url = null
+      if (draft.coverFile) {
+        cover_public_url = await uploadCover(draft.coverFile) // вернёт public URL
+      }
+
+      // 2) пишем статью в таблицу articles
+      // ⚠️ вставляем только те поля, которые точно есть в таблице:
+      // title (text), subtitle (text), paragraphs (jsonb), cover_url (text)
+      const { error } = await supabase.from('articles').insert({
+        title: payload.title,
+        subtitle: payload.subtitle || null,
+        paragraphs: payload.paragraphs, // jsonb
+        cover_url: cover_public_url,
+      })
+
+      if (error) throw error
+
+      setStatus('saved')
+      // если хочешь — очищать после публикации:
+      // setDraft(empty)
+    } catch (e) {
+      console.error(e)
+      setStatus('error')
+      setErrorText(e?.message || 'Ошибка при публикации.')
+    }
   }
 
   return (
@@ -82,6 +143,7 @@ export default function ArticleEditor() {
             <div className={styles.card}>
               <div className={styles.row}>
                 <div className={styles.label}>Обложка</div>
+
                 <label className={styles.fileBtn}>
                   Выбрать картинку
                   <input
@@ -93,7 +155,11 @@ export default function ArticleEditor() {
                 </label>
 
                 {draft.coverFile && (
-                  <button className={styles.ghostBtn} type="button" onClick={() => setField('coverFile', null)}>
+                  <button
+                    className={styles.ghostBtn}
+                    type="button"
+                    onClick={() => setField('coverFile', null)}
+                  >
                     Убрать
                   </button>
                 )}
@@ -189,23 +255,42 @@ export default function ArticleEditor() {
                 <button type="button" className={styles.ghostBtn} onClick={clearAll}>
                   Очистить
                 </button>
-                <button type="button" className={styles.btn} onClick={exportJson}>
-                  Добавить
+
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={publish}
+                  disabled={status === 'saving'}
+                  title="Загрузит обложку в Storage и создаст строку в таблице articles"
+                >
+                  {status === 'saving' ? 'Публикую…' : 'Опубликовать'}
                 </button>
               </div>
+
+              {status === 'saved' && (
+                <div style={{ marginTop: 10, color: '#2f4f47', fontWeight: 800 }}>
+                  ✅ Опубликовано в Supabase
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div style={{ marginTop: 10, color: '#8a2f2f', fontWeight: 800 }}>
+                  ❌ {errorText || 'Ошибка'}
+                </div>
+              )}
             </div>
           </div>
 
           {/* RIGHT: PREVIEW */}
           <div className={styles.preview}>
             <div className={styles.previewCard}>
-                <Article
-                  mini
-                  coverUrl={coverUrl}
-                  title={draft.title}
-                  subtitle={draft.subtitle}
-                  paragraphs={draft.paragraphs.filter(Boolean)}
-                />
+              <Article
+                mini
+                coverUrl={coverUrl}
+                title={draft.title}
+                subtitle={draft.subtitle}
+                paragraphs={draft.paragraphs.map((t) => t.trim()).filter(Boolean)}
+              />
             </div>
           </div>
         </div>
