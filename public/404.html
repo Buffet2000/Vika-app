@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script>
+      const base = '/Vika-app'
+      const path = location.pathname.replace(base, '')
+      location.replace(base + '/?redirect=' + path)
+    </script>
+  </head>
+  <body></body>
+</html>
