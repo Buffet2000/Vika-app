@@ -1,52 +1,75 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../lib/supabaseClient'
 import Article from '../../components/Article/Article.jsx'
+import { fetchPublishedArticles } from '../../api/articles.js'
+import styles from './ArticlePage.module.css'
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState('')
+
+  const [sort, setSort] = useState('newest')
 
   useEffect(() => {
-    async function loadArticles() {
-      const { data, error } = await supabase
-        .from('articles')
-        .select('*')
-        .order('created_at', { ascending: false })
+    let alive = true
 
-      if (error) {
-        console.error(error)
-        setError('Не удалось загрузить статьи')
-      } else {
-        setArticles(data || [])
+    ;(async () => {
+      try {
+        setLoading(true)
+        setError('')
+        const data = await fetchPublishedArticles({ sort })
+        if (alive) setArticles(data)
+      } catch (e) {
+        console.error(e)
+        if (alive) setError(e?.message || String(e))
+      } finally {
+        if (alive) setLoading(false)
       }
+    })()
 
-      setLoading(false)
-    }
-
-    loadArticles()
-  }, [])
-
-  if (loading) {
-    return <p style={{ padding: 40 }}>Загрузка статей…</p>
-  }
-
-  if (error) {
-    return <p style={{ padding: 40, color: 'red' }}>{error}</p>
-  }
-
-  if (!articles.length) {
-    return <p style={{ padding: 40 }}>Статей пока нет</p>
-  }
+    return () => { alive = false }
+  }, [sort])
 
   return (
     <>
-      {articles.map((a) => (
+      <section className={styles.top}>
+        <div className={`container ${styles.container}`}>
+          <div className={styles.bar}>
+            <div className={styles.label}>Сортировка:</div>
+
+            <div className={styles.controls}>
+              <button
+                type="button"
+                onClick={() => setSort('newest')}
+                className={`${styles.btn} ${sort === 'newest' ? styles.active : ''}`}
+              >
+                Сначала новые
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSort('oldest')}
+                className={`${styles.btn} ${sort === 'oldest' ? styles.active : ''}`}
+              >
+                Сначала старые
+              </button>
+            </div>
+          </div>
+
+          {loading && <div className={styles.note}>Загрузка…</div>}
+          {error && <div className={styles.note}>Ошибка: {error}</div>}
+          {!loading && !error && !articles.length && (
+            <div className={styles.note}>Пока нет опубликованных статей.</div>
+          )}
+        </div>
+      </section>
+
+      {!loading && !error && articles.map((a) => (
         <Article
           key={a.id}
-          coverUrl={a.cover_url || undefined}
+          coverUrl={a.cover_url || ''}
           title={a.title}
-          subtitle={a.subtitle}
+          subtitle={a.subtitle || ''}
           paragraphs={Array.isArray(a.paragraphs) ? a.paragraphs : []}
         />
       ))}

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import Article from '../Article/Article.jsx' // поправь путь под проект
+import { useParams } from 'react-router-dom'
+import Article from '../Article/Article.jsx'
 import styles from './ArticleEditor.module.css'
 
-import { supabase } from '../../lib/supabaseClient.js' // поправь путь под проект
-import { uploadCover } from '../../lib/uploadCover.js' // поправь путь под проект
+import { supabase } from '../../lib/supabaseClient.js'
+import { uploadCover } from '../../lib/uploadCover.js'
 
 const empty = {
   title: '',
@@ -11,24 +12,35 @@ const empty = {
   paragraphs: [''],
   coverFile: null,
 }
+function normalizeParagraphs(v) {
+  if (Array.isArray(v)) return v.map(String)
+  return ['']
+}
 
 export default function ArticleEditor() {
+  const params = useParams()
+  const editId = params?.id || null
   const [draft, setDraft] = useState(empty)
-  const [status, setStatus] = useState('idle') // idle | saving | saved | error
+
+  const [draftId, setDraftId] = useState(null)
+
+  const [coverDbUrl, setCoverDbUrl] = useState('')
+
+  const [status, setStatus] = useState('idle')
   const [errorText, setErrorText] = useState('')
 
-  // локальный preview для картинки (без загрузки)
-  const coverUrl = useMemo(() => {
+  const coverBlobUrl = useMemo(() => {
     if (!draft.coverFile) return ''
     return URL.createObjectURL(draft.coverFile)
   }, [draft.coverFile])
 
-  // важно: не копить blob-URL в памяти
+  const coverUrl = coverBlobUrl || coverDbUrl || ''
+
   useEffect(() => {
     return () => {
-      if (coverUrl) URL.revokeObjectURL(coverUrl)
+      if (coverBlobUrl) URL.revokeObjectURL(coverBlobUrl)
     }
-  }, [coverUrl])
+  }, [coverBlobUrl])
 
   function setField(key, value) {
     setDraft((p) => ({ ...p, [key]: value }))
@@ -65,6 +77,8 @@ export default function ArticleEditor() {
 
   function clearAll() {
     setDraft(empty)
+    setDraftId(null)
+    setCoverDbUrl('')
     setStatus('idle')
     setErrorText('')
   }
@@ -77,49 +91,178 @@ export default function ArticleEditor() {
     }
   }
 
-  // ✅ ПУБЛИКАЦИЯ: upload cover → insert row
-  async function publish() {
-    if (status === 'saving') return
+  function validateBase(payload) {
+    if (!payload.title) return 'Нужен заголовок.'
+    if (!payload.paragraphs.length) return 'Добавь хотя бы один абзац.'
+    return ''
+  }
+
+  useEffect(() => {
+    let alive = true
+
+    async function load() {
+      if (!editId) return
+
+      setStatus('loading')
+      setErrorText('')
+
+      try {
+        const { data, error } = await supabase
+          .from('articles')
+          .select('id,title,subtitle,paragraphs,cover_url,is_published,published_at,updated_at')
+          .eq('id', editId)
+          .single()
+
+        if (error) throw error
+        if (!alive) return
+
+        setDraftId(data.id)
+        setCoverDbUrl(data.cover_url || '')
+
+        setDraft({
+          title: data.title || '',
+          subtitle: data.subtitle || '',
+          paragraphs: normalizeParagraphs(data.paragraphs),
+          coverFile: null,
+        })
+
+        setStatus('idle')
+      } catch (e) {
+        console.error(e)
+        if (!alive) return
+        setStatus('error')
+        setErrorText(e?.message || 'Не удалось загрузить статью.')
+      }
+    }
+
+    load()
+    return () => {
+      alive = false
+    }
+  }, [editId])
+
+  async function saveDraft() {
+    if (status === 'saving' || status === 'publishing' || status === 'loading') return
     setErrorText('')
 
     const payload = buildPayload()
-
-    // базовая валидация
-    if (!payload.title) {
+    const v = validateBase(payload)
+    if (v) {
       setStatus('error')
-      setErrorText('Нужен заголовок.')
-      return
-    }
-    if (!payload.paragraphs.length) {
-      setStatus('error')
-      setErrorText('Добавь хотя бы один абзац.')
+      setErrorText(v)
       return
     }
 
     setStatus('saving')
 
     try {
-      // 1) грузим обложку (если выбрана)
-      let cover_public_url = null
-      if (draft.coverFile) {
-        cover_public_url = await uploadCover(draft.coverFile) // вернёт public URL
+      let id = draftId
+
+      if (!id) {
+        const { data, error } = await supabase
+          .from('articles')
+          .insert({
+            title: payload.title,
+            subtitle: payload.subtitle || null,
+            paragraphs: payload.paragraphs,
+            cover_url: null,
+            is_published: false,
+            published_at: null,
+          })
+          .select('id')
+          .single()
+
+        if (error) throw error
+        id = data.id
+        setDraftId(id)
       }
 
-      // 2) пишем статью в таблицу articles
-      // ⚠️ вставляем только те поля, которые точно есть в таблице:
-      // title (text), subtitle (text), paragraphs (jsonb), cover_url (text)
-      const { error } = await supabase.from('articles').insert({
-        title: payload.title,
-        subtitle: payload.subtitle || null,
-        paragraphs: payload.paragraphs, // jsonb
-        cover_url: cover_public_url,
-      })
+      let cover_public_url = null
+      if (draft.coverFile) {
+        cover_public_url = await uploadCover(draft.coverFile)
+        setCoverDbUrl(cover_public_url)
+        setField('coverFile', null)
+      }
+
+      const { error } = await supabase
+        .from('articles')
+        .update({
+          title: payload.title,
+          subtitle: payload.subtitle || null,
+          paragraphs: payload.paragraphs,
+          ...(cover_public_url ? { cover_url: cover_public_url } : {}),
+          is_published: false,
+          published_at: null,
+        })
+        .eq('id', id)
 
       if (error) throw error
 
       setStatus('saved')
-      // если хочешь — очищать после публикации:
-      // setDraft(empty)
+    } catch (e) {
+      console.error(e)
+      setStatus('error')
+      setErrorText(e?.message || 'Ошибка при сохранении.')
+    }
+  }
+
+  async function publish() {
+    if (status === 'saving' || status === 'publishing' || status === 'loading') return
+    setErrorText('')
+
+    const payload = buildPayload()
+    const v = validateBase(payload)
+    if (v) {
+      setStatus('error')
+      setErrorText(v)
+      return
+    }
+
+    setStatus('publishing')
+
+    try {
+      let id = draftId
+      if (!id) {
+        const { data, error } = await supabase
+          .from('articles')
+          .insert({
+            title: payload.title,
+            subtitle: payload.subtitle || null,
+            paragraphs: payload.paragraphs,
+            cover_url: null,
+            is_published: false,
+            published_at: null,
+          })
+          .select('id')
+          .single()
+
+        if (error) throw error
+        id = data.id
+        setDraftId(id)
+      }
+
+      let cover_public_url = null
+      if (draft.coverFile) {
+        cover_public_url = await uploadCover(draft.coverFile)
+        setCoverDbUrl(cover_public_url)
+        setField('coverFile', null)
+      }
+
+      const { error } = await supabase
+        .from('articles')
+        .update({
+          title: payload.title,
+          subtitle: payload.subtitle || null,
+          paragraphs: payload.paragraphs,
+          ...(cover_public_url ? { cover_url: cover_public_url } : {}),
+          is_published: true,
+          published_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+
+      if (error) throw error
+
+      setStatus('published')
     } catch (e) {
       console.error(e)
       setStatus('error')
@@ -127,18 +270,21 @@ export default function ArticleEditor() {
     }
   }
 
+  const isBusy = status === 'saving' || status === 'publishing' || status === 'loading'
+
   return (
     <section className={styles.section}>
       <div className={`container ${styles.container}`}>
         <header className={styles.head}>
-          <h1 className={styles.pageTitle}>Редактор статьи</h1>
+          <h1 className={styles.pageTitle}>
+            {editId ? 'Редактирование статьи' : 'Редактор статьи'}
+          </h1>
           <p className={styles.pageLead}>
             Заполни поля слева — справа увидишь, как статья выглядит на сайте.
           </p>
         </header>
 
         <div className={styles.layout}>
-          {/* LEFT: FORM */}
           <div className={styles.panel}>
             <div className={styles.card}>
               <div className={styles.row}>
@@ -154,11 +300,14 @@ export default function ArticleEditor() {
                   />
                 </label>
 
-                {draft.coverFile && (
+                {(draft.coverFile || coverDbUrl) && (
                   <button
                     className={styles.ghostBtn}
                     type="button"
-                    onClick={() => setField('coverFile', null)}
+                    onClick={() => {
+                      setField('coverFile', null)
+                      setCoverDbUrl('')
+                    }}
                   >
                     Убрать
                   </button>
@@ -202,7 +351,7 @@ export default function ArticleEditor() {
                   <div className={styles.blockHint}>Каждый абзац — отдельным полем.</div>
                 </div>
 
-                <button className={styles.btn} type="button" onClick={addParagraph}>
+                <button className={styles.btn} type="button" onClick={addParagraph} disabled={isBusy}>
                   + Абзац
                 </button>
               </div>
@@ -213,30 +362,9 @@ export default function ArticleEditor() {
                     <div className={styles.paraHead}>
                       <div className={styles.paraIndex}>Абзац {i + 1}</div>
                       <div className={styles.paraActions}>
-                        <button
-                          type="button"
-                          className={styles.iconBtn}
-                          onClick={() => moveParagraph(i, -1)}
-                          title="Вверх"
-                        >
-                          ↑
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.iconBtn}
-                          onClick={() => moveParagraph(i, +1)}
-                          title="Вниз"
-                        >
-                          ↓
-                        </button>
-                        <button
-                          type="button"
-                          className={styles.iconBtnDanger}
-                          onClick={() => removeParagraph(i)}
-                          title="Удалить"
-                        >
-                          ✕
-                        </button>
+                        <button type="button" className={styles.iconBtn} onClick={() => moveParagraph(i, -1)} title="Вверх" disabled={isBusy}>↑</button>
+                        <button type="button" className={styles.iconBtn} onClick={() => moveParagraph(i, +1)} title="Вниз" disabled={isBusy}>↓</button>
+                        <button type="button" className={styles.iconBtnDanger} onClick={() => removeParagraph(i)} title="Удалить" disabled={isBusy}>✕</button>
                       </div>
                     </div>
 
@@ -246,30 +374,47 @@ export default function ArticleEditor() {
                       value={t}
                       onChange={(e) => setParagraph(i, e.target.value)}
                       placeholder="Напиши абзац…"
+                      disabled={isBusy}
                     />
                   </div>
                 ))}
               </div>
 
               <div className={styles.footerRow}>
-                <button type="button" className={styles.ghostBtn} onClick={clearAll}>
+                <button type="button" className={styles.ghostBtn} onClick={clearAll} disabled={isBusy}>
                   Очистить
                 </button>
 
-                <button
-                  type="button"
-                  className={styles.btn}
-                  onClick={publish}
-                  disabled={status === 'saving'}
-                  title="Загрузит обложку в Storage и создаст строку в таблице articles"
-                >
-                  {status === 'saving' ? 'Публикую…' : 'Опубликовать'}
+                <button type="button" className={styles.ghostBtn} onClick={saveDraft} disabled={isBusy}>
+                  {status === 'saving' ? 'Сохраняю…' : 'Сохранить'}
+                </button>
+
+                <button type="button" className={styles.btn} onClick={publish} disabled={isBusy}>
+                  {status === 'publishing' ? 'Публикую…' : 'Опубликовать'}
                 </button>
               </div>
 
+              {draftId && (
+                <div style={{ marginTop: 10, color: 'rgba(47,79,71,0.7)', fontWeight: 800 }}>
+                  ID: {draftId}
+                </div>
+              )}
+
+              {status === 'loading' && (
+                <div style={{ marginTop: 10, color: '#2f4f47', fontWeight: 800 }}>
+                  ⏳ Загружаю статью…
+                </div>
+              )}
+
               {status === 'saved' && (
                 <div style={{ marginTop: 10, color: '#2f4f47', fontWeight: 800 }}>
-                  ✅ Опубликовано в Supabase
+                  ✅ Сохранено (черновик)
+                </div>
+              )}
+
+              {status === 'published' && (
+                <div style={{ marginTop: 10, color: '#2f4f47', fontWeight: 800 }}>
+                  ✅ Опубликовано
                 </div>
               )}
 
@@ -281,7 +426,6 @@ export default function ArticleEditor() {
             </div>
           </div>
 
-          {/* RIGHT: PREVIEW */}
           <div className={styles.preview}>
             <div className={styles.previewCard}>
               <Article

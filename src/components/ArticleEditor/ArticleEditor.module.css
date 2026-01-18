@@ -107,29 +107,19 @@
   overflow: hidden;
   border: 1px solid rgba(0, 0, 0, 0.06);
   background: rgba(255, 255, 255, 0.65);
-
-  /* важно: без фиксированной height */
   padding: 10px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* ограничиваем «максимальный рост», чтобы вертикальные не делали пол-экрана */
   max-height: 340px;
 }
 
 .coverMiniImg {
   display: block;
-
-  /* картинка подстраивается под контейнер */
   max-width: 100%;
   max-height: 320px;
-
-  /* ключ: не режем */
   object-fit: contain;
-
-  /* чтобы не было “лишнего” whitespace из-за baseline */
   vertical-align: middle;
 }
 
@@ -236,10 +226,6 @@
   min-width: 0;
 }
 
-/* =========================
-   PREVIEW MINI CARD (NEW)
-   ========================= */
-
 .previewCard {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 0, 0, 0.06);
@@ -249,7 +235,6 @@
   overflow: hidden;
 }
 
-/* Убираем “страничные” отступы/фон у Article внутри превью */
 .previewCard :global(section) {
   padding: 0 !important;
   background: transparent !important;
@@ -268,7 +253,6 @@
   border-radius: 0 !important;
 }
 
-/* Мини-обложка для превью */
 .previewCard :global(.cover) {
   height: 220px !important;
   min-height: 220px !important;
@@ -276,7 +260,6 @@
   background-position: center 25% !important;
 }
 
-/* Компактнее тело */
 .previewCard :global(.body) {
   padding: 16px 16px 18px !important;
 }
@@ -298,7 +281,6 @@
   max-width: none !important;
 }
 
-/* Ограничим текст, чтобы превью было аккуратным */
 .previewCard :global(.prose p) {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -306,7 +288,6 @@
   overflow: hidden;
 }
 
-/* responsive */
 @media (max-width: 980px) {
   .layout {
     grid-template-columns: 1fr;
@@ -318,7 +299,6 @@
   }
 }
 
-/* ===== MINI MODE ===== */
 .sectionMini {
   padding: 0;
   background: transparent;
@@ -366,12 +346,10 @@
   max-width: 70ch;
 }
 
-/* чтобы в мини-версии не было слишком “длинной простыни” */
 .proseMini p:nth-child(n + 4) {
   display: none;
 }
 
-/* mobile для mini */
 @media (max-width: 720px) {
   .coverMini {
     height: 200px;
