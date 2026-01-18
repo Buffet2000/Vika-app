@@ -10,34 +10,32 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-
   border-radius: 18px;
   border: 1px solid rgba(0,0,0,0.06);
   background: rgba(255,255,255,0.78);
   backdrop-filter: blur(10px);
   box-shadow: 0 18px 55px rgba(0,0,0,0.08);
-
   padding: 10px 12px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  text-decoration: none;
+  height: 32px;
+  overflow: visible;
+}
+
+.brandLogo {
+  height: 28px;
+  width: auto;
+  display: block;
+  transform: scale(2.5);
+  transform-origin: left center;
+  will-change: transform;
 }
 
 .brandDot {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(58,127,109,0.55);
-}
-
-.brandText {
-  color: #2f4f47;
-  font-weight: 900;
-  letter-spacing: -0.01em;
+  display: none;
 }
 
 .nav {
@@ -46,16 +44,36 @@
   gap: 18px;
 }
 
+.linkAdmin {
+  text-decoration: none;
+  color: #2f4f47;
+  font-weight: 900;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(58,127,109,0.18);
+  background: rgba(58,127,109,0.08);
+}
+
+.linkAdmin:hover {
+  background: rgba(58,127,109,0.12);
+}
+
 .link {
   text-decoration: none;
   color: #3f4e49;
   font-weight: 700;
   padding: 10px 10px;
   border-radius: 12px;
+  transition: background 0.12s ease, transform 0.12s ease;
 }
 
 .link:hover {
   background: rgba(58,127,109,0.10);
+  transform: translateY(-1px);
+}
+
+.link:active {
+  transform: translateY(0);
 }
 
 .cta {
@@ -70,12 +88,19 @@
   text-decoration: none;
   font-weight: 900;
   box-shadow: 0 10px 22px rgba(58,127,109,0.22);
+  transition: transform 0.12s ease, background 0.12s ease;
 }
 
 .cta:hover {
   background: #326f60;
+  transform: translateY(-1px);
 }
 
+.cta:active {
+  transform: translateY(0);
+}
+
+/* BURGER */
 .burger {
   display: none;
   width: 44px;
@@ -85,6 +110,24 @@
   background: rgba(255,255,255,0.75);
   backdrop-filter: blur(8px);
   box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s ease, transform 0.12s ease, border-color 0.12s ease;
+}
+
+.burger:hover {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(58,127,109,0.18);
+  transform: translateY(-1px);
+}
+
+.burger:active {
+  transform: translateY(0);
+}
+
+.burger:focus-visible {
+  outline: 2px solid rgba(58,127,109,0.35);
+  outline-offset: 2px;
 }
 
 .burgerLine {
@@ -116,22 +159,30 @@
     background: rgba(255,255,255,0.92);
     backdrop-filter: blur(10px);
     box-shadow: 0 18px 55px rgba(0,0,0,0.10);
+
+    z-index: 2;
   }
 
   .navOpen { display: flex; }
 
-  .link, .cta {
+  .link {
     width: 100%;
     text-align: left;
   }
 
   .cta {
+    width: 100%;
     text-align: center;
+    margin-left: 0;
   }
 
   .backdrop {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.15);
+    z-index: 1;
   }
+
+  .brandLogo { height: 26px; }
+  .brandText { font-size: 0.98rem; }
 }

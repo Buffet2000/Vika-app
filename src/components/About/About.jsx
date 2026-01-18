@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react'
 import styles from './About.module.css'
-
-import photo from '../../assets/images/blocks/My-photo.jpg'
+import photoFallback from '../../assets/images/blocks/My-photo.jpg'
+import { fetchAbout } from '../../api/about.js'
 
 const certificates = [
   'Диплом Педагога - психолога',
@@ -8,69 +9,81 @@ const certificates = [
   'Сертификат «Как понять мир подростка и как действовать в сложных ситуациях»',
   'Сертификат «Символдрама и современный психоанализ в диагностике и психотерапии депрессии»',
   'Сертификат «Эффективное взаимодействие с семейным окружением детей с опытом травмы»',
-  'Сертификат «Введение в Терапию Принятия и Ответственности (АСТ) и применение АСТ для работы с прокрастинацией»',
+  'Сертификат «Введение в Терапию Принятия и Ответственности (АСТ)»',
   'Сертификат «Введение в методы и подходы психотерапии»',
-  'Сертификат обучения гипнозу и гипнотерапии (Московский институт Гипноза)',
-  'Сертификат обучения методу ДПДГ (Московский Институт Гипноза)',
-]
-
-const formats = [
-  {
-    title: 'Индивидуальные консультации',
-    text: 'Для детей, подростков и взрослых. Бережно разбираем запрос и выстраиваем понятный план работы.',
-  },
-  {
-    title: 'Групповые онлайн-занятия для детей',
-    text: '«Школа чувств» — практики эмоций, общения и саморегуляции в поддерживающей атмосфере.',
-  },
-  {
-    title: 'Онлайн из любой точки мира',
-    text: 'Можно начать без ожидания и привязки к городу — подберём удобный формат и время.',
-  },
+  'Сертификат обучения гипнозу и гипнотерапии',
+  'Сертификат обучения методу ДПДГ',
 ]
 
 export default function About() {
+  const [about, setAbout] = useState(null)
+
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const data = await fetchAbout()
+        if (alive) setAbout(data)
+      } catch (e) {
+        console.error(e)
+      }
+    })()
+    return () => { alive = false }
+  }, [])
+
+  if (!about) return null
+
+  const {
+    name,
+    intro1,
+    intro2,
+    stats = [],
+    badges = [],
+    formats = [],
+    avatar_url,
+  } = about
+
+  const avatarUrl = avatar_url || photoFallback
+
   return (
     <section className={styles.section} id="about">
       <div className="container">
         <header className={styles.hero}>
           <div className={styles.heroLeft}>
             <h1 className={styles.h1}>Обо мне</h1>
-            <p className={styles.sublead}>
-              Меня зовут Виктория Деордиева.
-              Я психолог с более чем 15-летним опытом работы, много лет работаю с детьми, подростками и их родителями в системе образования и в частной практике.<br />
-            </p >
-            <p className={styles.sublead}>
-              Я знаю, как это когда ребёнок замыкается, когда в семье становится напряжённо, когда родитель не понимает, что происходит и как помочь.
-              Моя задача помочь вам и вашему ребёнку стать спокойнее, увереннее и ближе друг к другу.
-            </p>
 
-            <div className={styles.stats}>
-              <div className={styles.stat}>
-                <div className={styles.statNum}>14</div>
-                <div className={styles.statText}>лет в системе образования</div>
-              </div>
-              <div className={styles.stat}>
-                <div className={styles.statNum}>3000+</div>
-                <div className={styles.statText}>индивидуальных консультаций</div>
-              </div>
-              <div className={styles.stat}>
-                <div className={styles.statNum}>200+</div>
-                <div className={styles.statText}>тренингов и программ</div>
-              </div>
-            </div>
+            {name && (
+              <p className={styles.sublead}>
+                Меня зовут {name}.
+              </p>
+            )}
 
-            <div className={styles.badges}>
-              <span className={styles.badge}>дети</span>
-              <span className={styles.badge}>подростки</span>
-              <span className={styles.badge}>взрослые</span>
-              <span className={styles.badgeSoft}>онлайн</span>
-            </div>
+            {intro1 && <p className={styles.sublead}>{intro1}</p>}
+            {intro2 && <p className={styles.sublead}>{intro2}</p>}
+
+            {!!stats.length && (
+              <div className={styles.stats}>
+                {stats.map((s, i) => (
+                  <div key={i} className={styles.stat}>
+                    <div className={styles.statNum}>{s.num}</div>
+                    <div className={styles.statText}>{s.text}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!!badges.length && (
+              <div className={styles.badges}>
+                {badges.map((b) => (
+                  <span key={b} className={styles.badge}>{b}</span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className={styles.heroRight}>
             <div className={styles.photoCard}>
-              <img className={styles.photo} src={photo} alt="Фото психолога" />
+              <img className={styles.photo} src={avatarUrl} alt={name || 'Фото'} />
             </div>
           </div>
         </header>
@@ -82,10 +95,8 @@ export default function About() {
             <div className={styles.eduBlock}>
               <div className={styles.eduTitle}>Основное образование</div>
               <div className={styles.eduText}>
-                Государственный университет Республики Молдова
-                <br />
-                <b>Специальность:</b> Педагогика и психология
-                <br />
+                Государственный университет Республики Молдова<br />
+                <b>Специальность:</b> Педагогика и психология<br />
                 <b>Год окончания:</b> 2009
               </div>
             </div>
@@ -99,7 +110,7 @@ export default function About() {
               <ul className={styles.list}>
                 {certificates.map((t) => (
                   <li key={t} className={styles.item}>
-                    <span className={styles.dot} aria-hidden="true" />
+                    <span className={styles.dot} />
                     <span className={styles.text}>{t}</span>
                   </li>
                 ))}
@@ -111,56 +122,39 @@ export default function About() {
             <h2 className={styles.title}>Опыт работы</h2>
 
             <ul className={styles.list}>
-              <li className={styles.item}>
-                <span className={styles.dot} aria-hidden="true" />
-                <span className={styles.text}>
-                  <b>14 лет</b> в системе образования
-                </span>
-              </li>
-              <li className={styles.item}>
-                <span className={styles.dot} aria-hidden="true" />
-                <span className={styles.text}>— 10 лет в общеобразовательной школе</span>
-              </li>
-              <li className={styles.item}>
-                <span className={styles.dot} aria-hidden="true" />
-                <span className={styles.text}>— 4 года в Суворовском училище</span>
-              </li>
-              <li className={styles.item}>
-                <span className={styles.dot} aria-hidden="true" />
-                <span className={styles.text}>
-                  Более <b>3000</b> индивидуальных консультаций
-                </span>
-              </li>
-              <li className={styles.item}>
-                <span className={styles.dot} aria-hidden="true" />
-                <span className={styles.text}>
-                  Более <b>200</b> тренингов и групповых программ
-                </span>
-              </li>
+              {stats.map((s, i) => (
+                <li key={i} className={styles.item}>
+                  <span className={styles.dot} />
+                  <span className={styles.text}>
+                    <b>{s.num}</b> {s.text}
+                  </span>
+                </li>
+              ))}
             </ul>
 
             <div className={styles.note}>
-              Эти цифры — про практику и устойчивый опыт в работе с детьми, подростками и семейными
-              запросами.
+              Эти цифры — про практику и устойчивый опыт работы.
             </div>
           </article>
         </div>
 
-        <section className={styles.formats}>
-          <header className={styles.formatsHead}>
-            <h2 className={styles.h2}>Форматы работы</h2>
-            <p className={styles.lead}>Подберём формат под ваш запрос и ситуацию.</p>
-          </header>
+        {!!formats.length && (
+          <section className={styles.formats}>
+            <header className={styles.formatsHead}>
+              <h2 className={styles.h2}>Форматы работы</h2>
+              <p className={styles.lead}>Подберём формат под ваш запрос.</p>
+            </header>
 
-          <div className={styles.cards3}>
-            {formats.map((f) => (
-              <article key={f.title} className={styles.miniCard}>
-                <div className={styles.miniTitle}>{f.title}</div>
-                <div className={styles.miniText}>{f.text}</div>
-              </article>
-            ))}
-          </div>
-        </section>
+            <div className={styles.cards3}>
+              {formats.map((f) => (
+                <article key={f.title} className={styles.miniCard}>
+                  <div className={styles.miniTitle}>{f.title}</div>
+                  <div className={styles.miniText}>{f.text}</div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </section>
   )

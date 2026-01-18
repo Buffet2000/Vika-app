@@ -1,7 +1,6 @@
 import { supabase } from '../lib/supabaseClient'
 
 export async function sendBooking(data) {
-  // 1) сохраняем заявку в БД
   const { error: dbError } = await supabase.from('bookings').insert([
     {
       service_id: data.serviceId,
@@ -19,7 +18,6 @@ export async function sendBooking(data) {
 
   if (dbError) throw dbError
 
-  // 2) уведомляем в Telegram (ошибка тут НЕ должна ломать отправку)
   const { error: fnError } = await supabase.functions.invoke('notify-telegram', {
     body: data,
   })
