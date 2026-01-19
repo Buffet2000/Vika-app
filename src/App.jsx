@@ -23,6 +23,7 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/consultations" element={<ConsultationsPage />} />
         <Route path="/articles" element={<ArticlePage />} />
+
         <Route
           path="/admin"
           element={
@@ -31,12 +32,16 @@ export default function App() {
             </RequireAuth>
           }
         >
-          <Route path="about" element={<AdminAboutPage />} />
           <Route index element={<AdminHomePage />} />
           <Route path="articles" element={<AdminArticlesPage />} />
+          <Route path="about" element={<AdminAboutPage />} />
+
+          {/* создать */}
           <Route path="editor" element={<ArticleEditorPage />} />
+          {/* редактировать */}
+          <Route path="editor/:id" element={<ArticleEditorPage />} />
         </Route>
-        {/* опционально: 404 */}
+
         {/* <Route path="*" element={<div style={{ padding: 24 }}>Страница не найдена</div>} /> */}
       </Routes>
     </Layout>
