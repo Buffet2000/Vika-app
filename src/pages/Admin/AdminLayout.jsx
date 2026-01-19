@@ -11,42 +11,59 @@ export default function AdminLayout() {
     <section className={styles.section}>
       <div className={`container ${styles.container}`}>
         <div className={styles.shell}>
-          <aside className={styles.side}>
+          {/* TOP BAR */}
+          <header className={styles.topbar}>
             <div className={styles.brand}>
               <div className={styles.brandTitle}>Кабинет</div>
               <div className={styles.brandSub}>Администрирование сайта</div>
             </div>
 
-            <nav className={styles.nav}>
+            <nav className={styles.nav} aria-label="Меню админки">
               <NavLink
                 to="/admin"
                 end
-                className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.active : ''}`
+                }
               >
                 Обзор
               </NavLink>
 
               <NavLink
                 to="/admin/articles"
-                className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.active : ''}`
+                }
               >
                 Статьи
               </NavLink>
 
-              <NavLink to="/admin/about" className={({isActive}) => `${styles.link} ${isActive ? styles.active : ''}`}>Обо мне</NavLink>
+              <NavLink
+                to="/admin/about"
+                className={({ isActive }) =>
+                  `${styles.link} ${isActive ? styles.active : ''}`
+                }
+              >
+                Обо мне
+              </NavLink>
 
-              <button className={`${styles.link} ${styles.disabled}`} type="button" disabled>
+              <button
+                className={`${styles.link} ${styles.disabled}`}
+                type="button"
+                disabled
+              >
                 Настройки — скоро
               </button>
             </nav>
 
-            <div className={styles.bottom}>
+            <div className={styles.actions}>
               <button className={styles.logout} type="button" onClick={logout}>
                 Выйти
               </button>
             </div>
-          </aside>
+          </header>
 
+          {/* MAIN */}
           <main className={styles.main}>
             <Outlet />
           </main>
