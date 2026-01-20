@@ -1,10 +1,12 @@
+// src/api/articles.js
 import { supabase } from '../lib/supabaseClient'
 
-export async function saveDraft({ id, title, subtitle, paragraphs, coverUrl }) {
+export async function saveDraft({ id, title, subtitle, content, content_text, coverUrl }) {
   const payload = {
     title,
-    subtitle,
-    paragraphs,
+    subtitle: subtitle || null,
+    content: content || null,
+    content_text: content_text || null,
     cover_url: coverUrl || null,
     is_published: false,
     published_at: null,
@@ -52,7 +54,7 @@ export async function fetchPublishedArticles({ sort = 'newest' } = {}) {
 
   const { data, error } = await supabase
     .from('articles')
-    .select('id, title, subtitle, paragraphs, cover_url, published_at, updated_at, created_at')
+    .select('id, title, subtitle, content, cover_url, published_at, updated_at, created_at')
     .eq('is_published', true)
     .order('published_at', { ascending, nullsFirst: false })
     .order('updated_at', { ascending })

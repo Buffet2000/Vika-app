@@ -65,13 +65,13 @@ export default function ArticlesPage() {
       </section>
 
       {!loading && !error && articles.map((a) => (
-        <Article
-          key={a.id}
-          coverUrl={a.cover_url || ''}
-          title={a.title}
-          subtitle={a.subtitle || ''}
-          paragraphs={Array.isArray(a.paragraphs) ? a.paragraphs : []}
-        />
+      <Article
+        key={a.id}
+        coverUrl={a.cover_url || ''}
+        title={a.title}
+        subtitle={a.subtitle || ''}
+        content={a.content}
+      />
       ))}
     </>
   )
