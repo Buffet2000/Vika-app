@@ -16,7 +16,7 @@
 .topbar {
   position: sticky;
   top: 16px;
-  z-index: 5;
+  z-index: 50;
 
   display: grid;
   grid-template-columns: 240px 1fr 140px;
@@ -30,8 +30,19 @@
   box-shadow: 0 18px 55px rgba(0, 0, 0, 0.08);
   overflow: hidden;
 
-  padding /* чтобы не "прыгало" при скролле */: 1;
   padding: 12px;
+
+  /* анимация скрытия */
+  transform: translateY(0);
+  transition: transform 0.18s ease, opacity 0.18s ease;
+  will-change: transform;
+}
+
+/* когда скроллим вниз — прячем */
+.topbarHidden {
+  transform: translateY(calc(-100% - 18px));
+  opacity: 0;
+  pointer-events: none;
 }
 
 .brand {
@@ -81,7 +92,6 @@
 
   transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
 
-  /* важно для button */
   font: inherit;
   line-height: 1.2;
   appearance: none;
@@ -157,9 +167,7 @@
   min-width: 0;
 }
 
-/* --------- MOBILE / SMALL SCREENS --------- */
-
-/* 1) На узких экранах делаем меню в ОДНУ строку со скроллом */
+/* MOBILE */
 @media (max-width: 680px) {
   .topbar {
     grid-template-columns: 1fr;
@@ -190,9 +198,14 @@
     flex: 0 0 auto;
     scroll-snap-align: start;
   }
+
+  /* на мобилке прячем чуть мягче */
+  .topbarHidden {
+    transform: translateY(-120%);
+    opacity: 0;
+  }
 }
 
-/* 2) Чуть компактнее на совсем маленьких */
 @media (max-width: 420px) {
   .link {
     padding: 9px 12px;
