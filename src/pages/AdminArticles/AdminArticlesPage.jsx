@@ -1,4 +1,3 @@
-// src/pages/AdminArticles/AdminArticlesPage.jsx
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminArticleCard from '../../components/AdminArticleCard/AdminArticleCard.jsx'
@@ -12,18 +11,20 @@ import {
 
 export default function AdminArticlesPage() {
   const nav = useNavigate()
+
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   const [sort, setSort] = useState('new')
+  const [busyId, setBusyId] = useState(null)
 
   async function load() {
     setLoading(true)
     setError('')
     try {
       const data = await fetchAllArticlesAdmin()
-      setItems(data)
+      setItems(Array.isArray(data) ? data : [])
     } catch (e) {
       console.error(e)
       setError(e?.message || String(e))
@@ -41,35 +42,54 @@ export default function AdminArticlesPage() {
   }
 
   const sortedItems = useMemo(() => {
-    const arr = [...items]
+    const arr = Array.isArray(items) ? [...items] : []
     arr.sort((a, b) => {
-      const da = getSortIso(a) ? new Date(getSortIso(a)).getTime() : 0
-      const db = getSortIso(b) ? new Date(getSortIso(b)).getTime() : 0
-      return sort === 'new' ? db - da : da - db
+      const ia = getSortIso(a)
+      const ib = getSortIso(b)
+
+      const da = ia ? Date.parse(ia) : 0
+      const db = ib ? Date.parse(ib) : 0
+
+      const na = Number.isFinite(da) ? da : 0
+      const nb = Number.isFinite(db) ? db : 0
+
+      return sort === 'new' ? nb - na : na - nb
     })
     return arr
   }, [items, sort])
 
   async function onDelete(id, title) {
+    if (!id) return
+    if (busyId) return
+
     const ok = window.confirm(
       `Удалить статью?\n\n"${title || 'Без названия'}"\n\nЭто действие нельзя отменить.`
     )
     if (!ok) return
 
     try {
+      setBusyId(id)
       await deleteArticleById(id)
-      setItems((p) => p.filter((x) => x.id !== id))
+      setItems((p) => (Array.isArray(p) ? p.filter((x) => x.id !== id) : []))
     } catch (e) {
       console.error(e)
       alert(e?.message || 'Ошибка удаления')
+    } finally {
+      setBusyId(null)
     }
   }
 
   async function onTogglePublish(id, current) {
+    if (!id) return
+    if (busyId) return
+
     try {
+      setBusyId(id)
+
       await setArticlePublished(id, !current)
+
       setItems((p) =>
-        p.map((x) =>
+        (Array.isArray(p) ? p : []).map((x) =>
           x.id === id
             ? {
                 ...x,
@@ -82,6 +102,8 @@ export default function AdminArticlesPage() {
     } catch (e) {
       console.error(e)
       alert(e?.message || 'Ошибка')
+    } finally {
+      setBusyId(null)
     }
   }
 
@@ -99,18 +121,29 @@ export default function AdminArticlesPage() {
             </p>
 
             <div className={styles.toolbar}>
-                <div className={styles.sort}>
-                    <span className={styles.sortLabel}>Сортировка:</span>
+              <div className={styles.sort}>
+                <span className={styles.sortLabel}>Сортировка:</span>
 
-                    <div className={styles.sortBtns} role="group" aria-label="Сортировка статей">
-                    <button type="button" className={`${styles.sortBtn} ${styles.sortBtnActive}`}>
-                        Сначала новые
-                    </button>
-                    <button type="button" className={styles.sortBtn}>
-                        Сначала старые
-                    </button>
-                    </div>
+                <div className={styles.sortBtns} role="group" aria-label="Сортировка статей">
+                  <button
+                    type="button"
+                    onClick={() => setSort('new')}
+                    className={`${styles.sortBtn} ${sort === 'new' ? styles.sortBtnActive : ''}`}
+                    aria-pressed={sort === 'new'}
+                  >
+                    Сначала новые
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSort('old')}
+                    className={`${styles.sortBtn} ${sort === 'old' ? styles.sortBtnActive : ''}`}
+                    aria-pressed={sort === 'old'}
+                  >
+                    Сначала старые
+                  </button>
                 </div>
+              </div>
             </div>
           </div>
 
@@ -135,6 +168,7 @@ export default function AdminArticlesPage() {
                 publishedAt={a.published_at}
                 updatedAt={a.updated_at}
                 createdAt={a.created_at}
+                busy={busyId === a.id}
                 onEdit={() => nav(`/admin/editor/${a.id}`)}
                 onTogglePublish={() => onTogglePublish(a.id, !!a.is_published)}
                 onDelete={() => onDelete(a.id, a.title)}

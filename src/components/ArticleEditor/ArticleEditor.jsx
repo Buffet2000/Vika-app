@@ -5,25 +5,86 @@ import styles from './ArticleEditor.module.css'
 
 import { supabase } from '../../lib/supabaseClient.js'
 import { uploadCover } from '../../lib/uploadCover.js'
+import RichTextEditor from '../Editor/RichTextEditor.jsx'
 
-const empty = {
-  title: '',
-  subtitle: '',
-  paragraphs: [''],
-  coverFile: null,
+const EMPTY_DOC = { type: 'doc', content: [{ type: 'paragraph', content: [] }] }
+
+function makeEmpty() {
+  return {
+    title: '',
+    subtitle: '',
+    content: typeof structuredClone === 'function'
+      ? structuredClone(EMPTY_DOC)
+      : JSON.parse(JSON.stringify(EMPTY_DOC)),
+    coverFile: null,
+  }
 }
-function normalizeParagraphs(v) {
-  if (Array.isArray(v)) return v.map(String)
-  return ['']
+
+function safeDoc(v) {
+  if (!v || typeof v !== 'object') return makeEmpty().content
+  if (v.type !== 'doc') return makeEmpty().content
+  if (!Array.isArray(v.content) || v.content.length === 0) return makeEmpty().content
+  return v
+}
+
+function extractTextFromTipTap(doc) {
+  const d = safeDoc(doc)
+
+  const outBlocks = []
+  let current = ''
+
+  const pushBlock = () => {
+    const t = current
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+    if (t) outBlocks.push(t)
+    current = ''
+  }
+
+  const textOfInline = (node) => {
+    if (!node) return ''
+    if (node.type === 'text') return node.text || ''
+    if (node.type === 'hardBreak') return '\n'
+    if (!Array.isArray(node.content)) return ''
+    return node.content.map(textOfInline).join('')
+  }
+
+  const walk = (node) => {
+    if (!node) return
+
+    if (node.type === 'paragraph' || node.type === 'heading') {
+      current += textOfInline(node)
+      pushBlock()
+      return
+    }
+
+    if (node.type === 'listItem') {
+      const liText = (node.content || []).map(textOfInline).join('').trim()
+      if (liText) {
+        current += `- ${liText}`
+        pushBlock()
+      }
+      return
+    }
+
+    if (Array.isArray(node.content)) {
+      node.content.forEach(walk)
+    }
+  }
+
+  walk(d)
+  pushBlock()
+
+  return outBlocks.join('\n\n').trim()
 }
 
 export default function ArticleEditor() {
   const params = useParams()
   const editId = params?.id || null
-  const [draft, setDraft] = useState(empty)
 
+  const [draft, setDraft] = useState(makeEmpty)
   const [draftId, setDraftId] = useState(null)
-
   const [coverDbUrl, setCoverDbUrl] = useState('')
 
   const [status, setStatus] = useState('idle')
@@ -46,37 +107,8 @@ export default function ArticleEditor() {
     setDraft((p) => ({ ...p, [key]: value }))
   }
 
-  function setParagraph(i, value) {
-    setDraft((p) => {
-      const next = [...p.paragraphs]
-      next[i] = value
-      return { ...p, paragraphs: next }
-    })
-  }
-
-  function addParagraph() {
-    setDraft((p) => ({ ...p, paragraphs: [...p.paragraphs, ''] }))
-  }
-
-  function removeParagraph(i) {
-    setDraft((p) => {
-      const next = p.paragraphs.filter((_, idx) => idx !== i)
-      return { ...p, paragraphs: next.length ? next : [''] }
-    })
-  }
-
-  function moveParagraph(i, dir) {
-    setDraft((p) => {
-      const next = [...p.paragraphs]
-      const j = i + dir
-      if (j < 0 || j >= next.length) return p
-      ;[next[i], next[j]] = [next[j], next[i]]
-      return { ...p, paragraphs: next }
-    })
-  }
-
   function clearAll() {
-    setDraft(empty)
+    setDraft(makeEmpty())
     setDraftId(null)
     setCoverDbUrl('')
     setStatus('idle')
@@ -84,16 +116,22 @@ export default function ArticleEditor() {
   }
 
   function buildPayload() {
+    const title = draft.title.trim()
+    const subtitle = draft.subtitle.trim()
+    const content = safeDoc(draft.content)
+    const content_text = extractTextFromTipTap(content)
+
     return {
-      title: draft.title.trim(),
-      subtitle: draft.subtitle.trim(),
-      paragraphs: draft.paragraphs.map((t) => t.trim()).filter(Boolean),
+      title,
+      subtitle: subtitle || null,
+      content,
+      content_text,
     }
   }
 
   function validateBase(payload) {
     if (!payload.title) return 'Нужен заголовок.'
-    if (!payload.paragraphs.length) return 'Добавь хотя бы один абзац.'
+    if (!payload.content_text || payload.content_text.trim().length < 3) return 'Нужен текст статьи.'
     return ''
   }
 
@@ -109,7 +147,7 @@ export default function ArticleEditor() {
       try {
         const { data, error } = await supabase
           .from('articles')
-          .select('id,title,subtitle,paragraphs,cover_url,is_published,published_at,updated_at')
+          .select('id,title,subtitle,content,content_text,cover_url,is_published,published_at,updated_at')
           .eq('id', editId)
           .single()
 
@@ -122,7 +160,7 @@ export default function ArticleEditor() {
         setDraft({
           title: data.title || '',
           subtitle: data.subtitle || '',
-          paragraphs: normalizeParagraphs(data.paragraphs),
+          content: safeDoc(data.content),
           coverFile: null,
         })
 
@@ -141,6 +179,32 @@ export default function ArticleEditor() {
     }
   }, [editId])
 
+  async function ensureDraftRow(payload) {
+    let id = draftId
+
+    if (!id) {
+      const { data, error } = await supabase
+        .from('articles')
+        .insert({
+          title: payload.title,
+          subtitle: payload.subtitle,
+          content: payload.content,
+          content_text: payload.content_text,
+          cover_url: null,
+          is_published: false,
+          published_at: null,
+        })
+        .select('id')
+        .single()
+
+      if (error) throw error
+      id = data.id
+      setDraftId(id)
+    }
+
+    return id
+  }
+
   async function saveDraft() {
     if (status === 'saving' || status === 'publishing' || status === 'loading') return
     setErrorText('')
@@ -156,26 +220,7 @@ export default function ArticleEditor() {
     setStatus('saving')
 
     try {
-      let id = draftId
-
-      if (!id) {
-        const { data, error } = await supabase
-          .from('articles')
-          .insert({
-            title: payload.title,
-            subtitle: payload.subtitle || null,
-            paragraphs: payload.paragraphs,
-            cover_url: null,
-            is_published: false,
-            published_at: null,
-          })
-          .select('id')
-          .single()
-
-        if (error) throw error
-        id = data.id
-        setDraftId(id)
-      }
+      const id = await ensureDraftRow(payload)
 
       let cover_public_url = null
       if (draft.coverFile) {
@@ -188,8 +233,9 @@ export default function ArticleEditor() {
         .from('articles')
         .update({
           title: payload.title,
-          subtitle: payload.subtitle || null,
-          paragraphs: payload.paragraphs,
+          subtitle: payload.subtitle,
+          content: payload.content,
+          content_text: payload.content_text,
           ...(cover_public_url ? { cover_url: cover_public_url } : {}),
           is_published: false,
           published_at: null,
@@ -197,7 +243,6 @@ export default function ArticleEditor() {
         .eq('id', id)
 
       if (error) throw error
-
       setStatus('saved')
     } catch (e) {
       console.error(e)
@@ -221,25 +266,7 @@ export default function ArticleEditor() {
     setStatus('publishing')
 
     try {
-      let id = draftId
-      if (!id) {
-        const { data, error } = await supabase
-          .from('articles')
-          .insert({
-            title: payload.title,
-            subtitle: payload.subtitle || null,
-            paragraphs: payload.paragraphs,
-            cover_url: null,
-            is_published: false,
-            published_at: null,
-          })
-          .select('id')
-          .single()
-
-        if (error) throw error
-        id = data.id
-        setDraftId(id)
-      }
+      const id = await ensureDraftRow(payload)
 
       let cover_public_url = null
       if (draft.coverFile) {
@@ -252,8 +279,9 @@ export default function ArticleEditor() {
         .from('articles')
         .update({
           title: payload.title,
-          subtitle: payload.subtitle || null,
-          paragraphs: payload.paragraphs,
+          subtitle: payload.subtitle,
+          content: payload.content,
+          content_text: payload.content_text,
           ...(cover_public_url ? { cover_url: cover_public_url } : {}),
           is_published: true,
           published_at: new Date().toISOString(),
@@ -261,7 +289,6 @@ export default function ArticleEditor() {
         .eq('id', id)
 
       if (error) throw error
-
       setStatus('published')
     } catch (e) {
       console.error(e)
@@ -297,6 +324,7 @@ export default function ArticleEditor() {
                     type="file"
                     accept="image/*"
                     onChange={(e) => setField('coverFile', e.target.files?.[0] || null)}
+                    disabled={isBusy}
                   />
                 </label>
 
@@ -308,6 +336,7 @@ export default function ArticleEditor() {
                       setField('coverFile', null)
                       setCoverDbUrl('')
                     }}
+                    disabled={isBusy}
                   >
                     Убрать
                   </button>
@@ -329,6 +358,7 @@ export default function ArticleEditor() {
                   value={draft.title}
                   onChange={(e) => setField('title', e.target.value)}
                   placeholder="Например: Как помочь ребёнку справиться с тревогой"
+                  disabled={isBusy}
                 />
               </label>
 
@@ -340,6 +370,7 @@ export default function ArticleEditor() {
                   value={draft.subtitle}
                   onChange={(e) => setField('subtitle', e.target.value)}
                   placeholder="1–2 предложения — о чём статья и для кого"
+                  disabled={isBusy}
                 />
               </label>
             </div>
@@ -347,49 +378,42 @@ export default function ArticleEditor() {
             <div className={styles.card}>
               <div className={styles.rowBetween}>
                 <div>
-                  <div className={styles.blockTitle}>Текст</div>
-                  <div className={styles.blockHint}>Каждый абзац — отдельным полем.</div>
+                  <div className={styles.blockTitle}>Текст (TipTap)</div>
+                  <div className={styles.blockHint}>Один “взрослый” редактор вместо абзацев.</div>
                 </div>
-
-                <button className={styles.btn} type="button" onClick={addParagraph} disabled={isBusy}>
-                  + Абзац
-                </button>
               </div>
 
-              <div className={styles.paras}>
-                {draft.paragraphs.map((t, i) => (
-                  <div key={i} className={styles.para}>
-                    <div className={styles.paraHead}>
-                      <div className={styles.paraIndex}>Абзац {i + 1}</div>
-                      <div className={styles.paraActions}>
-                        <button type="button" className={styles.iconBtn} onClick={() => moveParagraph(i, -1)} title="Вверх" disabled={isBusy}>↑</button>
-                        <button type="button" className={styles.iconBtn} onClick={() => moveParagraph(i, +1)} title="Вниз" disabled={isBusy}>↓</button>
-                        <button type="button" className={styles.iconBtnDanger} onClick={() => removeParagraph(i)} title="Удалить" disabled={isBusy}>✕</button>
-                      </div>
-                    </div>
-
-                    <textarea
-                      className={styles.textarea}
-                      rows={4}
-                      value={t}
-                      onChange={(e) => setParagraph(i, e.target.value)}
-                      placeholder="Напиши абзац…"
-                      disabled={isBusy}
-                    />
-                  </div>
-                ))}
-              </div>
+              <RichTextEditor
+                value={safeDoc(draft.content)}
+                onChange={(json) => setField('content', safeDoc(json))}
+                disabled={isBusy}
+              />
 
               <div className={styles.footerRow}>
-                <button type="button" className={styles.ghostBtn} onClick={clearAll} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={styles.ghostBtn}
+                  onClick={clearAll}
+                  disabled={isBusy}
+                >
                   Очистить
                 </button>
 
-                <button type="button" className={styles.ghostBtn} onClick={saveDraft} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={styles.ghostBtn}
+                  onClick={saveDraft}
+                  disabled={isBusy}
+                >
                   {status === 'saving' ? 'Сохраняю…' : 'Сохранить'}
                 </button>
 
-                <button type="button" className={styles.btn} onClick={publish} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={publish}
+                  disabled={isBusy}
+                >
                   {status === 'publishing' ? 'Публикую…' : 'Опубликовать'}
                 </button>
               </div>
@@ -426,6 +450,7 @@ export default function ArticleEditor() {
             </div>
           </div>
 
+          {/* PREVIEW */}
           <div className={styles.preview}>
             <div className={styles.previewCard}>
               <Article
@@ -433,7 +458,7 @@ export default function ArticleEditor() {
                 coverUrl={coverUrl}
                 title={draft.title}
                 subtitle={draft.subtitle}
-                paragraphs={draft.paragraphs.map((t) => t.trim()).filter(Boolean)}
+                content={safeDoc(draft.content)}
               />
             </div>
           </div>

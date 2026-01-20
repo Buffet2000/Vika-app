@@ -1,10 +1,11 @@
 .top {
+  width: 1200px;
   padding: 18px 0 6px;
   background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
 }
 
 .container {
-  max-width: 1200px;
+  width: 1200px;
 }
 
 .bar {
