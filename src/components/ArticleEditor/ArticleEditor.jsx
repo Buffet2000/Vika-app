@@ -27,6 +27,9 @@ function safeDoc(v) {
   return v
 }
 
+/**
+ * Plain-text из TipTap JSON (для content_text в БД / поиска)
+ */
 function extractTextFromTipTap(doc) {
   const d = safeDoc(doc)
 
@@ -68,9 +71,7 @@ function extractTextFromTipTap(doc) {
       return
     }
 
-    if (Array.isArray(node.content)) {
-      node.content.forEach(walk)
-    }
+    if (Array.isArray(node.content)) node.content.forEach(walk)
   }
 
   walk(d)
@@ -90,6 +91,11 @@ export default function ArticleEditor() {
   const [status, setStatus] = useState('idle')
   const [errorText, setErrorText] = useState('')
 
+  // MODAL preview
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  const isBusy = status === 'saving' || status === 'publishing' || status === 'loading'
+
   const coverBlobUrl = useMemo(() => {
     if (!draft.coverFile) return ''
     return URL.createObjectURL(draft.coverFile)
@@ -102,6 +108,24 @@ export default function ArticleEditor() {
       if (coverBlobUrl) URL.revokeObjectURL(coverBlobUrl)
     }
   }, [coverBlobUrl])
+
+  // Закрытие превью по Escape + блокировка скролла body
+  useEffect(() => {
+    if (!previewOpen) return
+
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setPreviewOpen(false)
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [previewOpen])
 
   function setField(key, value) {
     setDraft((p) => ({ ...p, [key]: value }))
@@ -135,6 +159,7 @@ export default function ArticleEditor() {
     return ''
   }
 
+  // load for edit
   useEffect(() => {
     let alive = true
 
@@ -174,9 +199,7 @@ export default function ArticleEditor() {
     }
 
     load()
-    return () => {
-      alive = false
-    }
+    return () => { alive = false }
   }, [editId])
 
   async function ensureDraftRow(payload) {
@@ -206,7 +229,7 @@ export default function ArticleEditor() {
   }
 
   async function saveDraft() {
-    if (status === 'saving' || status === 'publishing' || status === 'loading') return
+    if (isBusy) return
     setErrorText('')
 
     const payload = buildPayload()
@@ -252,7 +275,7 @@ export default function ArticleEditor() {
   }
 
   async function publish() {
-    if (status === 'saving' || status === 'publishing' || status === 'loading') return
+    if (isBusy) return
     setErrorText('')
 
     const payload = buildPayload()
@@ -297,8 +320,6 @@ export default function ArticleEditor() {
     }
   }
 
-  const isBusy = status === 'saving' || status === 'publishing' || status === 'loading'
-
   return (
     <section className={styles.section}>
       <div className={`container ${styles.container}`}>
@@ -307,11 +328,11 @@ export default function ArticleEditor() {
             {editId ? 'Редактирование статьи' : 'Редактор статьи'}
           </h1>
           <p className={styles.pageLead}>
-            Заполни поля слева — справа увидишь, как статья выглядит на сайте.
+            Заполни поля — и по кнопке открой “Превью”, чтобы увидеть итоговый вид.
           </p>
         </header>
 
-        <div className={styles.layout}>
+        <div className={styles.layoutSingle}>
           <div className={styles.panel}>
             <div className={styles.card}>
               <div className={styles.row}>
@@ -379,7 +400,7 @@ export default function ArticleEditor() {
               <div className={styles.rowBetween}>
                 <div>
                   <div className={styles.blockTitle}>Текст (TipTap)</div>
-                  <div className={styles.blockHint}>Один “взрослый” редактор вместо абзацев.</div>
+                  <div className={styles.blockHint}>Один “взрослый” редактор.</div>
                 </div>
               </div>
 
@@ -397,6 +418,15 @@ export default function ArticleEditor() {
                   disabled={isBusy}
                 >
                   Очистить
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.ghostBtn}
+                  onClick={() => setPreviewOpen(true)}
+                  disabled={isBusy}
+                >
+                  Превью
                 </button>
 
                 <button
@@ -449,12 +479,37 @@ export default function ArticleEditor() {
               )}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* PREVIEW */}
-          <div className={styles.preview}>
-            <div className={styles.previewCard}>
+      {/* MODAL PREVIEW */}
+      {previewOpen && (
+        <div
+          className={styles.previewBackdrop}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Предпросмотр статьи"
+          onMouseDown={(e) => {
+            // клик по фону закрывает
+            if (e.target === e.currentTarget) setPreviewOpen(false)
+          }}
+        >
+          <div className={styles.previewModal} onMouseDown={(e) => e.stopPropagation()}>
+            <div className={styles.previewTopbar}>
+              <div className={styles.previewTitle}>Превью</div>
+
+              <button
+                type="button"
+                className={styles.previewClose}
+                onClick={() => setPreviewOpen(false)}
+                aria-label="Закрыть превью"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className={styles.previewBody}>
               <Article
-                mini
                 coverUrl={coverUrl}
                 title={draft.title}
                 subtitle={draft.subtitle}
@@ -463,7 +518,7 @@ export default function ArticleEditor() {
             </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }
