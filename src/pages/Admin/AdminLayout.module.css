@@ -1,6 +1,5 @@
 .section {
   padding: 26px 0 60px;
-  background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
 }
 
 .container {
@@ -12,7 +11,6 @@
   gap: 16px;
 }
 
-/* TOP BAR */
 .topbar {
   position: sticky;
   top: 16px;
@@ -31,14 +29,11 @@
   overflow: hidden;
 
   padding: 12px;
-
-  /* анимация скрытия */
   transform: translateY(0);
   transition: transform 0.18s ease, opacity 0.18s ease;
   will-change: transform;
 }
 
-/* когда скроллим вниз — прячем */
 .topbarHidden {
   transform: translateY(calc(-100% - 18px));
   opacity: 0;
@@ -199,7 +194,6 @@
     scroll-snap-align: start;
   }
 
-  /* на мобилке прячем чуть мягче */
   .topbarHidden {
     transform: translateY(-120%);
     opacity: 0;
