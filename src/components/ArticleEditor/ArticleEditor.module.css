@@ -1,6 +1,5 @@
 .section {
   padding: 32px 0 70px;
-  background: linear-gradient(135deg, #fbfbfb, #f2f6f5);
 }
 
 .container {
@@ -29,7 +28,6 @@
   line-height: 1.7;
 }
 
-/* ======= вместо .layout две колонки — один широкий блок ======= */
 .layoutSingle {
   display: block;
 }
@@ -103,7 +101,6 @@
   resize: vertical;
 }
 
-/* мини-превью выбранной обложки в редакторе */
 .coverMini {
   margin-top: 12px;
   border-radius: 14px;
@@ -173,7 +170,6 @@
   cursor: pointer;
 }
 
-/* нижняя панель кнопок */
 .footerRow {
   display: flex;
   justify-content: flex-end;
@@ -239,7 +235,6 @@
   overflow: auto;
 }
 
-/* мобилка */
 @media (max-width: 700px) {
   .previewBackdrop {
     padding: 10px;
